@@ -40,6 +40,7 @@ select, textarea {
 }
 
 textarea {
+    margin-right: 10px;
     resize: vertical; /* Позволяет изменять размер текстовой области только по вертикали */
 }
 
@@ -58,6 +59,11 @@ button:hover {
     background-color: #218838; /* Темнее при наведении */
 }
 
+.copyButton {
+    margin-top: 20px;
+}
+
+
 .result {
     margin-top: 20px;
     padding: 10px;
@@ -67,4 +73,9 @@ button:hover {
 
 .result h2 {
     margin-top: 0; /* Убираем верхний отступ для заголовка результата */
+}
+.result p {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
 }
