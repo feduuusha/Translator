@@ -28,7 +28,7 @@ public class TranslatorServiceImpl implements TranslatorService{
     private static final String BASE_URL = "https://translate.googleapis.com/translate_a/single?client=gtx&dt=t";
     private final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
     @Override
-    public List<String> translateWords(RequestData requestData) {
+    public String translateWords(RequestData requestData) {
         String url = BASE_URL + "&sl=" + requestData.getSourceLanguage() + "&tl=" + requestData.getTargetLanguage();
         List<Task> tasks = new LinkedList<>();
         for (String word : requestData.getWords()) {
@@ -38,7 +38,7 @@ public class TranslatorServiceImpl implements TranslatorService{
             List<Future<String>> futures = executor.invokeAll(tasks);
             List<String> translatedWords = futures.stream().map(Future::resultNow).toList();
             repository.saveRequest(requestData, translatedWords);
-            return translatedWords;
+            return String.join(" ", translatedWords);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
