@@ -74,6 +74,7 @@ button:hover {
 .result h2 {
     margin-top: 0; /* Убираем верхний отступ для заголовка результата */
 }
+
 .result p {
     overflow: hidden;
     display: -webkit-box;

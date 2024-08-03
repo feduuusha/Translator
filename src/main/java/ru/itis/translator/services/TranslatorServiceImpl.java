@@ -3,6 +3,8 @@ package ru.itis.translator.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.ValidationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,13 +14,12 @@ import ru.itis.translator.repositories.TranslatorRepository;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class TranslatorServiceImpl implements TranslatorService {
     private final TranslatorRepository repository;
@@ -38,17 +39,31 @@ public class TranslatorServiceImpl implements TranslatorService {
 
     @Override
     public String translateWords(RequestData requestData) {
+        Pattern pattern = Pattern.compile("^[^@№&=+*{}<>%$#]+$");
+        Matcher matcher;
+        for (String word : requestData.getWords()) {
+            matcher = pattern.matcher(word);
+            if (!matcher.matches()) {
+                log.error("Bad Request: " + word + " not passed validation", new ValidationException());
+                throw new ValidationException();
+            }
+        }
+        log.debug("Validation complete: " + String.join(" ", requestData.getWords()));
         List<Future<String>> futures = Arrays.stream(requestData.getWords())
                 .map(word -> executorService.submit(new TranslationTask(buildUrl(requestData, word))))
                 .collect(Collectors.toList());
 
         List<String> translatedWords = collectTranslations(futures);
+        log.debug("Translation complete: " + String.join(" ", translatedWords));
         repository.saveRequest(requestData, translatedWords);
         return String.join(" ", translatedWords);
     }
 
     private String buildUrl(RequestData requestData, String word) {
-        return BASE_URL + "&sl=" + requestData.getSourceLanguage() + "&tl=" + requestData.getTargetLanguage() + "&q=" + word;
+        String completedURL = BASE_URL + "&sl=" + requestData.getSourceLanguage() +
+                "&tl=" + requestData.getTargetLanguage() + "&q=" + word;
+        log.debug("URL of the API request: " + completedURL);
+        return completedURL;
     }
 
     private List<String> collectTranslations(List<Future<String>> futures) {
@@ -61,7 +76,8 @@ public class TranslatorServiceImpl implements TranslatorService {
         try {
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new IllegalStateException("Error while translating", e);
+            log.error("Error while translating", e);
+            throw new IllegalStateException(e);
         }
     }
 
@@ -78,16 +94,19 @@ public class TranslatorServiceImpl implements TranslatorService {
             if (entity.getStatusCode().is2xxSuccessful()) {
                 return parseTranslation(entity.getBody());
             } else {
-                throw new IllegalStateException("Failed to fetch translation: " + entity.getStatusCode());
+                log.error("Failed to fetch translation: " + entity.getStatusCode());
+                throw new IllegalStateException();
             }
         }
 
         private String parseTranslation(String responseBody) {
+            log.debug("Successful API response");
             try {
                 JsonNode jsonNode = objectMapper.readTree(responseBody);
                 return jsonNode.get(0).get(0).get(0).asText();
             } catch (JsonProcessingException e) {
-                throw new IllegalStateException("Error parsing translation response", e);
+                log.error("Error parsing translation response", e);
+                throw new IllegalStateException(e);
             }
         }
     }

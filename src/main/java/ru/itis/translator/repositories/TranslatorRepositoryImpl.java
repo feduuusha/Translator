@@ -1,6 +1,7 @@
 package ru.itis.translator.repositories;
 
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import ru.itis.translator.models.RequestData;
@@ -8,6 +9,7 @@ import ru.itis.translator.models.RequestData;
 import java.sql.*;
 import java.util.List;
 
+@Slf4j
 @Repository
 public class TranslatorRepositoryImpl implements TranslatorRepository {
     private static final String SQL_CREATE_TABLE = "create table if not exists requests (id serial primary key, ip varchar(45), " +
@@ -25,8 +27,10 @@ public class TranslatorRepositoryImpl implements TranslatorRepository {
         try (Connection connection = getConnection();
              Statement createTableStatement = connection.createStatement()) {
             createTableStatement.executeUpdate(SQL_CREATE_TABLE);
+            log.info("Table \"requests\" has been successfully created");
         } catch (SQLException e) {
-            throw new IllegalArgumentException("Failed to initialize the database", e);
+            log.error("Failed to initialize the database", e);
+            throw new IllegalArgumentException(e);
         }
     }
 
@@ -43,9 +47,11 @@ public class TranslatorRepositoryImpl implements TranslatorRepository {
             preparedStatement.setString(3, String.join(" ", translatedWords));
             preparedStatement.setString(4, requestData.getSourceLanguage());
             preparedStatement.setString(5, requestData.getTargetLanguage());
+            log.debug("Saving to the database complete");
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new IllegalStateException("Failed to save request data", e);
+            log.error("Failed to save request data", e);
+            throw new IllegalStateException(e);
         }
     }
 }
