@@ -27,7 +27,7 @@
             <label for="separator">Выберите разделитель слов:</label>
             <select id="separator" name="sp">
                 <option value=" ">Пробел</option>
-                <option value=":">Двоиточие</option>
+                <option value=":">Двоеточие</option>
                 <option value=";">Точка с запятой</option>
                 <option value=",">Запятая</option>
             </select>
