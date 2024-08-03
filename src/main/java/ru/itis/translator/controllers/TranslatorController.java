@@ -19,7 +19,7 @@ public class TranslatorController {
     }
 
     @GetMapping("/")
-    public String products() {
+    public String index() {
         return "index";
     }
     @GetMapping("/translate")
@@ -31,9 +31,9 @@ public class TranslatorController {
                             Model model) {
         RequestData requestData = new RequestData(sourceLanguage, targetLanguage, text.split(separator), request.getRemoteAddr());
         model.addAttribute("translatedText", service.translateWords(requestData));
-        model.addAttribute("separator", separator);
         model.addAttribute("sourceLanguage", sourceLanguage);
         model.addAttribute("targetLanguage", targetLanguage);
+        model.addAttribute("separator", separator);
         return "index";
     }
 }

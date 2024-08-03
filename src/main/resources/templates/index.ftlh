@@ -76,19 +76,6 @@
         </script>
     </#if>
 
-
-
-    <script>
-        document.getElementById('copyButton').addEventListener('click', function() {
-            const textarea = document.getElementById('translate');
-            navigator.clipboard.writeText(textarea.textContent).then(function() {
-                alert('Текст скопирован в буфер обмена!');
-            }, function(err) {
-                console.error('Ошибка при копировании текста: ', err);
-            });
-        });
-    </script>
-
     <script>
         document.getElementById('textToTranslate').addEventListener('input', function() {
             const regex = /^[^@№^&=+*{}<>%$#]*$/;
@@ -113,7 +100,18 @@
         });
     </script>
 
-
+    <script>
+        <#if translatedText??>
+            document.getElementById('copyButton').addEventListener('click', function() {
+                const textarea = document.getElementById('translate');
+                navigator.clipboard.writeText(textarea.textContent).then(function() {
+                    alert('Текст скопирован в буфер обмена!');
+                }, function(err) {
+                    console.error('Ошибка при копировании текста: ', err);
+                });
+            });
+        </#if>
+    </script>
 
 </div>
 
