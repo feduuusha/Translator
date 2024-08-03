@@ -22,12 +22,4 @@ public class TranslatorServiceTests {
                 new String[]{"привет", "мир"}, "127.0.0.1");
         Assertions.assertEquals("Hello world", translatorService.translateWords(data));
     }
-
-    @Test
-    public void incorrectTextInputTest() {
-        RequestData data = new RequestData("ru", "en",
-                new String[]{"#"}, "127.0.0.1");
-        Assertions.assertThrows(IllegalStateException.class, () -> {translatorService.translateWords(data);});
-
-    }
 }

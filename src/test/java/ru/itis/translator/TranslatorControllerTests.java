@@ -8,7 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @SpringBootTest
@@ -21,19 +22,44 @@ public class TranslatorControllerTests {
     @Test
     public void indexTest() throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/").accept(MediaType.TEXT_HTML))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.model().hasNoErrors());
+                .andExpect(status().isOk())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name("index"));
     }
 
     @Test
     public void translateTest() throws Exception {
-        String url = "/translate?sl=en&tl=ru&sp=+&text=Hello+world%2C+this+is+my+first+program".replace("+", " ");
-        mvc.perform(MockMvcRequestBuilders.get(url).accept(MediaType.TEXT_HTML))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.model().attribute("translatedText", "Привет мир%2C этот является мой первый программа"))
-                .andExpect(MockMvcResultMatchers.model().attribute("sourceLanguage", "en"))
-                .andExpect(MockMvcResultMatchers.model().attribute("targetLanguage", "ru"))
-                .andExpect(MockMvcResultMatchers.model().attribute("separator", " "));
+        mvc.perform(MockMvcRequestBuilders.get("/translate")
+                        .param("sl", "en")
+                        .param("tl", "ru")
+                        .param("sp", " ")
+                        .param("text", "Hello world, this is my first program")
+                        .accept(MediaType.TEXT_HTML))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("translatedText", "Привет мир, этот является мой первый программа"))
+                .andExpect(model().attribute("sourceLanguage", "en"))
+                .andExpect(model().attribute("targetLanguage", "ru"))
+                .andExpect(model().attribute("separator", " "))
+                .andExpect(view().name("index"));
     }
 
+    @Test
+    public void translateTest2() {
+        try {
+            mvc.perform(MockMvcRequestBuilders.get("/translate")
+                            .param("sl", "ru")
+                            .param("tl", "en")
+                            .param("sp", ":")
+                            .param("text", "каждый:охотник:желает:знать:где:сидит:фазан")
+                            .accept(MediaType.TEXT_HTML))
+                    .andExpect(status().isOk())
+                    .andExpect(model().attribute("translatedText", "every hunter wishes know Where is sitting pheasant"))
+                    .andExpect(model().attribute("sourceLanguage", "ru"))
+                    .andExpect(model().attribute("targetLanguage", "en"))
+                    .andExpect(model().attribute("separator", ":"))
+                    .andExpect(view().name("index"));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }

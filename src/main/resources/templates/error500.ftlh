@@ -12,19 +12,23 @@
             text-align: center;
             padding: 50px;
         }
+
         h1 {
             font-size: 50px;
             margin-bottom: 20px;
         }
+
         p {
             font-size: 20px;
             margin-bottom: 30px;
         }
+
         a {
             text-decoration: none;
             color: #28a745;
             font-weight: bold;
         }
+
         a:hover {
             text-decoration: underline;
         }

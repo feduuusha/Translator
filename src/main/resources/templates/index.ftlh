@@ -35,7 +35,7 @@
 
         <div class="form-group">
             <label for="textToTranslate">Введите слова для перевода:</label>
-            <textarea id="textToTranslate" name="text" rows="4" cols="50" required="" placeholder="Введите слова здесь..." style="margin-top: 0px; margin-bottom: 0px; height: 66px; border: 1px solid rgb(204, 204, 204);"></textarea>
+            <textarea id="textToTranslate" name="text" rows="4" cols="50" required="" placeholder="Введите слова здесь..." style="margin-top: 0; margin-bottom: 0; height: 66px; border: 1px solid rgb(204, 204, 204);"></textarea>
         </div>
 
         <button type="submit">Перевести</button>
