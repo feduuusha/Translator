@@ -10,10 +10,9 @@ import java.util.List;
 
 @Repository
 public class TranslatorRepositoryImpl implements TranslatorRepository {
-    private static final String SQL_CREATE_TABLE = "create table requests (id serial primary key, ip varchar(45), " +
-            "entered_text text, translated_text text);";
-    private static final String SQL_DROP_TABLE = "drop table if exists requests";
-    private static final String SQL_INSERT_VALUES = "insert into requests (ip, entered_text, translated_text) VALUES (?, ?, ?)";
+    private static final String SQL_CREATE_TABLE = "create table if not exists requests (id serial primary key, ip varchar(45), " +
+            "entered_text text, translated_text text, source_language varchar(10), target_language varchar(10));";
+    private static final String SQL_INSERT_VALUES = "insert into requests (ip, entered_text, translated_text, source_language, target_language) VALUES (?, ?, ?, ?, ?)";
     @Value("${database.url}")
     private String url;
     @Value("${database.username}")
@@ -24,12 +23,10 @@ public class TranslatorRepositoryImpl implements TranslatorRepository {
     @PostConstruct
     private void init() {
         try (Connection connection = getConnection();
-             Statement deleteTableStatement = connection.createStatement();
-             PreparedStatement createTableStatement = connection.prepareStatement(SQL_CREATE_TABLE)) {
-            deleteTableStatement.executeUpdate(SQL_DROP_TABLE);
-            createTableStatement.executeUpdate();
+             Statement createTableStatement = connection.createStatement()) {
+            createTableStatement.executeUpdate(SQL_CREATE_TABLE);
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new IllegalArgumentException("Failed to initialize the database", e);
         }
     }
 
@@ -41,12 +38,14 @@ public class TranslatorRepositoryImpl implements TranslatorRepository {
     public void saveRequest(RequestData requestData, List<String> translatedWords) {
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_VALUES)) {
-            preparedStatement.setString(1, requestData.getIp());
+            preparedStatement.setString(1, requestData.getIpAddress());
             preparedStatement.setString(2, String.join(" ", requestData.getWords()));
             preparedStatement.setString(3, String.join(" ", translatedWords));
+            preparedStatement.setString(4, requestData.getSourceLanguage());
+            preparedStatement.setString(5, requestData.getTargetLanguage());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new IllegalStateException("Failed to save request data", e);
         }
     }
 }

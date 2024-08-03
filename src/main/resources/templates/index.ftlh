@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -36,49 +35,70 @@
 
         <div class="form-group">
             <label for="textToTranslate">Введите слова для перевода:</label>
-            <textarea id="textToTranslate" name="text" rows="4" cols="50" required placeholder="Введите слова здесь..."></textarea>
+            <textarea id="textToTranslate" name="text" rows="4" cols="50" required="" placeholder="Введите слова здесь..." style="margin-top: 0px; margin-bottom: 0px; height: 66px; border: 1px solid rgb(204, 204, 204);"></textarea>
         </div>
 
         <button type="submit">Перевести</button>
     </form>
 
     <#if translatedText??>
-    <div class="result">
-        <h2>Результат перевода:</h2>
-        <p id="translate">${translatedText}</p>
+        <div class="result">
+            <h2>Результат перевода:</h2>
+            <p id="translate">${translatedText}</p>
 
-    </div>
+        </div>
 
         <button class="copyButton" id="copyButton">Скопировать в буфер обмена</button>
-
     </#if>
 
 
-    <script>
-        const objSelect1 = document.getElementById("sourceLanguage");
-        <#if sourceLanguage??>
-        const langCode1 = "${sourceLanguage}";
-        objSelect1.value = langCode1;
-        </#if>
-    </script>
+    <#if sourceLanguage??>
+        <script>
+            const objSelect1 = document.getElementById("sourceLanguage");
+            const langCode1 = "${sourceLanguage}";
+            objSelect1.value = langCode1;
+        </script>
+    </#if>
+
+    <#if targetLanguage??>
+        <script>
+            const objSelect2 = document.getElementById("targetLanguage");
+            const langCode2 = "${targetLanguage}";
+            objSelect2.value = langCode2;
+        </script>
+    </#if>
+
+    <#if separator??>
+        <script>
+            const objSelect3 = document.getElementById("separator");
+            const separator = "${separator}";
+            objSelect3.value = separator;
+        </script>
+    </#if>
 
     <script>
-        const objSelect2 = document.getElementById("targetLanguage");
-        <#if targetLanguage??>
-        const langCode2 = "${targetLanguage}";
-        objSelect2.value = langCode2;
-        </#if>
+        document.getElementById('textToTranslate').addEventListener('input', function() {
+            const regex = /^[^@№^&=+*{}<>%$#]*$/;
+            const textarea = document.getElementById('textToTranslate');
+            if (!regex.test(textarea.value)) {
+                textarea.style.border = '4px solid red';
+            } else {
+                textarea.style.border = '1px solid #ccc';
+            }
+        })
+        document.getElementById('myForm').addEventListener('submit', function(event) {
+            const textarea = document.getElementById('textToTranslate')
+            const regex = /^[^@№^&=+*{}<>%$#]*$/;
+
+            if (!regex.test(textarea.value)) {
+                textarea.style.border = '4px solid red';
+                event.preventDefault();
+                alert("Введены недопустимые символы")
+            } else {
+                textarea.style.border = '1px solid #ccc';
+            }
+        });
     </script>
-
-    <script>
-        const objSelect3 = document.getElementById("separator");
-        <#if separator??>
-        const separator = "${separator}";
-        objSelect3.value = separator;
-        </#if>
-    </script>
-
-
 
     <script>
         <#if translatedText??>
@@ -93,7 +113,7 @@
         </#if>
     </script>
 
-
 </div>
+
 </body>
 </html>
