@@ -1,6 +1,7 @@
 package ru.itis.translator.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -9,61 +10,84 @@ import org.springframework.web.client.RestTemplate;
 import ru.itis.translator.models.RequestData;
 import ru.itis.translator.repositories.TranslatorRepository;
 
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 @Service
-public class TranslatorServiceImpl implements TranslatorService{
+public class TranslatorServiceImpl implements TranslatorService {
     private final TranslatorRepository repository;
-
-    @Autowired
-    public TranslatorServiceImpl(TranslatorRepository repository) {
-        this.repository = repository;
-    }
+    private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
+    private final ExecutorService executorService;
 
     private static final String BASE_URL = "https://translate.googleapis.com/translate_a/single?client=gtx&dt=t";
-    private final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+
+    @Autowired
+    public TranslatorServiceImpl(TranslatorRepository repository, RestTemplate restTemplate, ObjectMapper objectMapper) {
+        this.repository = repository;
+        this.restTemplate = restTemplate;
+        this.objectMapper = objectMapper;
+        this.executorService = Executors.newFixedThreadPool(10);
+    }
+
     @Override
-    public List<String> translateWords(RequestData requestData) {
-        String url = BASE_URL + "&sl=" + requestData.getSourceLanguage() + "&tl=" + requestData.getTargetLanguage();
-        List<Task> tasks = new LinkedList<>();
-        for (String word : requestData.getWords()) {
-            tasks.add(new Task(url + "&q=" + word));
-        }
+    public String translateWords(RequestData requestData) {
+        List<Future<String>> futures = Arrays.stream(requestData.getWords())
+                .map(word -> executorService.submit(new TranslationTask(buildUrl(requestData, word))))
+                .collect(Collectors.toList());
+
+        List<String> translatedWords = collectTranslations(futures);
+        repository.saveRequest(requestData, translatedWords);
+        return String.join(" ", translatedWords);
+    }
+
+    private String buildUrl(RequestData requestData, String word) {
+        return BASE_URL + "&sl=" + requestData.getSourceLanguage() + "&tl=" + requestData.getTargetLanguage() + "&q=" + word;
+    }
+
+    private List<String> collectTranslations(List<Future<String>> futures) {
+        return futures.stream()
+                .map(this::getTranslation)
+                .collect(Collectors.toList());
+    }
+
+    private String getTranslation(Future<String> future) {
         try {
-            List<Future<String>> futures = executor.invokeAll(tasks);
-            List<String> translatedWords = futures.stream().map(Future::resultNow).toList();
-            repository.saveRequest(requestData, translatedWords);
-            return translatedWords;
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            return future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new IllegalStateException("Error while translating", e);
         }
     }
 
-    private static class Task implements Callable<String> {
+    private class TranslationTask implements Callable<String> {
         private final String url;
 
-        public Task(String url) {
+        public TranslationTask(String url) {
             this.url = url;
         }
 
         @Override
         public String call() {
-            RestTemplate restTemplate = new RestTemplate();
-            ObjectMapper mapper = new ObjectMapper();
             ResponseEntity<String> entity = restTemplate.getForEntity(url, String.class);
             if (entity.getStatusCode().is2xxSuccessful()) {
-                try {
-                    return mapper.readTree(entity.getBody()).get(0).get(0).get(0).asText();
-                } catch (JsonProcessingException e) {
-                    throw new IllegalStateException(e);
-                }
+                return parseTranslation(entity.getBody());
             } else {
-                throw new IllegalStateException();
+                throw new IllegalStateException("Failed to fetch translation: " + entity.getStatusCode());
+            }
+        }
+
+        private String parseTranslation(String responseBody) {
+            try {
+                JsonNode jsonNode = objectMapper.readTree(responseBody);
+                return jsonNode.get(0).get(0).get(0).asText();
+            } catch (JsonProcessingException e) {
+                throw new IllegalStateException("Error parsing translation response", e);
             }
         }
     }

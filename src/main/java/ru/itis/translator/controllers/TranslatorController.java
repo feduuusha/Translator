@@ -23,14 +23,17 @@ public class TranslatorController {
         return "index";
     }
     @GetMapping("/translate")
-    public String translate(@RequestParam(value = "sl") final String sl,
-                            @RequestParam(value = "tl") final String tl,
-                            @RequestParam(value = "q") final String q,
-                            @RequestParam(value = "sp") final String sp,
+    public String translate(@RequestParam(value = "sl") final String sourceLanguage,
+                            @RequestParam(value = "tl") final String targetLanguage,
+                            @RequestParam(value = "text") final String text,
+                            @RequestParam(value = "sp") final String separator,
                             HttpServletRequest request,
                             Model model) {
-        RequestData requestData = new RequestData(sl, tl, q.split(sp), request.getRemoteAddr());
-        model.addAttribute("translatedText", service.translateWords(requestData).toString());
+        RequestData requestData = new RequestData(sourceLanguage, targetLanguage, text.split(separator), request.getRemoteAddr());
+        model.addAttribute("translatedText", service.translateWords(requestData));
+        model.addAttribute("separator", separator);
+        model.addAttribute("sourceLanguage", sourceLanguage);
+        model.addAttribute("targetLanguage", targetLanguage);
         return "index";
     }
 }
