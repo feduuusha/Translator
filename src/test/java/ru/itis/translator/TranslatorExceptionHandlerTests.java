@@ -35,7 +35,7 @@ public class TranslatorExceptionHandlerTests {
 
     @Test
     public void error500Test() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/translate?sl=en&tl=hui&sp=5&text=123").accept(MediaType.TEXT_HTML))
+        mvc.perform(MockMvcRequestBuilders.get("/translate?sl=en&tl=lol&sp=5&text=123").accept(MediaType.TEXT_HTML))
                 .andExpect(MockMvcResultMatchers.status().is(500));
     }
 }
