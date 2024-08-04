@@ -15,7 +15,7 @@ public class GlobalExceptionHandler {
     protected ModelAndView handleServerException(Exception ex) {
         log.debug("Processing the HTTP 500 status code");
         ModelAndView modelAndView = new ModelAndView("error500");
-        modelAndView.addObject("message", "Произошла ошибка: " + ex.getMessage());
+        modelAndView.addObject("message", "Error has occurred: " + ex.getMessage());
         modelAndView.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         return modelAndView;
     }
@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
     protected ModelAndView handleNoResourceFoundException(Exception ex) {
         log.debug("Processing the HTTP 404 status code");
         ModelAndView modelAndView = new ModelAndView("error404");
-        modelAndView.addObject("message", "Произошла ошибка: " + ex.getMessage());
+        modelAndView.addObject("message", "Error has occurred: " + ex.getMessage());
         modelAndView.setStatus(HttpStatus.NOT_FOUND);
         return modelAndView;
     }
@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
     protected ModelAndView handleOtherExceptions(Exception ex) {
         log.debug("Processing the HTTP 400 status code");
         ModelAndView modelAndView = new ModelAndView("error400");
-        modelAndView.addObject("message", "Произошла ошибка: " + ex.getMessage());
+        modelAndView.addObject("message", "Error has occurred: " + ex.getMessage());
         modelAndView.setStatus(HttpStatus.BAD_REQUEST);
         return modelAndView;
     }

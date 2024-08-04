@@ -39,16 +39,7 @@ public class TranslatorServiceImpl implements TranslatorService {
 
     @Override
     public String translateWords(RequestData requestData) {
-        Pattern pattern = Pattern.compile("^[^@№&=+*{}<>%$#]+$");
-        Matcher matcher;
-        for (String word : requestData.getWords()) {
-            matcher = pattern.matcher(word);
-            if (!matcher.matches()) {
-                log.error("Bad Request: " + word + " not passed validation", new ValidationException());
-                throw new ValidationException();
-            }
-        }
-        log.debug("Validation complete: " + String.join(" ", requestData.getWords()));
+        validateWords(requestData.getWords());
         List<Future<String>> futures = Arrays.stream(requestData.getWords())
                 .map(word -> executorService.submit(new TranslationTask(buildUrl(requestData, word))))
                 .collect(Collectors.toList());
@@ -57,6 +48,19 @@ public class TranslatorServiceImpl implements TranslatorService {
         log.debug("Translation complete: " + String.join(" ", translatedWords));
         repository.saveRequest(requestData, translatedWords);
         return String.join(" ", translatedWords);
+    }
+
+    private static void validateWords(String[] words) {
+        Pattern pattern = Pattern.compile("^[^@№&=+*{}<>%$#]+$");
+        Matcher matcher;
+        for (String word : words) {
+            matcher = pattern.matcher(word);
+            if (!matcher.matches()) {
+                log.error("Bad Request: " + word + " not passed validation", new ValidationException());
+                throw new ValidationException();
+            }
+        }
+        log.debug("Validation complete: " + String.join(" ", words));
     }
 
     private String buildUrl(RequestData requestData, String word) {
@@ -84,7 +88,7 @@ public class TranslatorServiceImpl implements TranslatorService {
     private class TranslationTask implements Callable<String> {
         private final String url;
 
-        public TranslationTask(String url) {
+        private TranslationTask(String url) {
             this.url = url;
         }
 
@@ -100,9 +104,9 @@ public class TranslatorServiceImpl implements TranslatorService {
         }
 
         private String parseTranslation(String responseBody) {
-            log.debug("Successful API response");
             try {
                 JsonNode jsonNode = objectMapper.readTree(responseBody);
+                log.debug("Successful API response: " + jsonNode.get(0).get(0).get(0).asText());
                 return jsonNode.get(0).get(0).get(0).asText();
             } catch (JsonProcessingException e) {
                 log.error("Error parsing translation response", e);

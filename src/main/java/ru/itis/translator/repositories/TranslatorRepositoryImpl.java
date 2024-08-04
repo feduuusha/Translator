@@ -27,7 +27,7 @@ public class TranslatorRepositoryImpl implements TranslatorRepository {
         try (Connection connection = getConnection();
              Statement createTableStatement = connection.createStatement()) {
             createTableStatement.executeUpdate(SQL_CREATE_TABLE);
-            log.info("Table \"requests\" has been successfully created");
+            log.info("The \"requests\" table has been created or already exists");
         } catch (SQLException e) {
             log.error("Failed to initialize the database", e);
             throw new IllegalArgumentException(e);
