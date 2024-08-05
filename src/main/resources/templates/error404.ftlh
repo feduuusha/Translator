@@ -13,6 +13,16 @@
             padding: 50px;
         }
 
+        @media screen and (prefers-color-scheme: dark) {
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #212529;
+                color: #ffffff;
+                text-align: center;
+                padding: 50px;
+            }
+        }
+
         h1 {
             font-size: 50px;
             margin-bottom: 20px;
