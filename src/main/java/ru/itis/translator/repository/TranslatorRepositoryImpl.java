@@ -1,10 +1,10 @@
-package ru.itis.translator.repositories;
+package ru.itis.translator.repository;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
-import ru.itis.translator.models.RequestData;
+import ru.itis.translator.model.RequestData;
 
 import java.sql.*;
 import java.util.List;

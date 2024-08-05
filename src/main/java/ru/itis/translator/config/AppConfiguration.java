@@ -1,4 +1,4 @@
-package ru.itis.translator.configurations;
+package ru.itis.translator.config;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;

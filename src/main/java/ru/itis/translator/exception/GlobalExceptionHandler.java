@@ -1,4 +1,4 @@
-package ru.itis.translator.exceptions;
+package ru.itis.translator.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

@@ -1,6 +1,6 @@
-package ru.itis.translator.services;
+package ru.itis.translator.service;
 
-import ru.itis.translator.models.RequestData;
+import ru.itis.translator.model.RequestData;
 
 
 public interface TranslatorService {

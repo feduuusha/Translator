@@ -1,4 +1,4 @@
-package ru.itis.translator.controllers;
+package ru.itis.translator.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotBlank;
@@ -10,8 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.itis.translator.models.RequestData;
-import ru.itis.translator.services.TranslatorService;
+import ru.itis.translator.model.RequestData;
+import ru.itis.translator.service.TranslatorService;
 
 @Slf4j
 @Controller

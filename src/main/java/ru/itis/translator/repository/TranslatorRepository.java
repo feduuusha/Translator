@@ -1,6 +1,6 @@
-package ru.itis.translator.repositories;
+package ru.itis.translator.repository;
 
-import ru.itis.translator.models.RequestData;
+import ru.itis.translator.model.RequestData;
 
 import java.util.List;
 
