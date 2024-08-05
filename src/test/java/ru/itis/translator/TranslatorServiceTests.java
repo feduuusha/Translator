@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.itis.translator.models.RequestData;
-import ru.itis.translator.services.TranslatorServiceImpl;
+import ru.itis.translator.model.RequestData;
+import ru.itis.translator.service.TranslatorServiceImpl;
 
 @SpringBootTest
 public class TranslatorServiceTests {

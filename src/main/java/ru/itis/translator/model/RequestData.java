@@ -1,4 +1,4 @@
-package ru.itis.translator.models;
+package ru.itis.translator.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
