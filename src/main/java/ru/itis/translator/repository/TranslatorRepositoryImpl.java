@@ -4,10 +4,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
-import ru.itis.translator.model.RequestData;
 
 import java.sql.*;
-import java.util.List;
 
 @Slf4j
 @Repository
@@ -39,14 +37,14 @@ public class TranslatorRepositoryImpl implements TranslatorRepository {
     }
 
     @Override
-    public void saveRequest(RequestData requestData, List<String> translatedWords) {
+    public void saveRequest(String sourceLanguage, String targetLanguage, String text, String translatedText, String ipAddress) {
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_VALUES)) {
-            preparedStatement.setString(1, requestData.getIpAddress());
-            preparedStatement.setString(2, String.join(" ", requestData.getWords()));
-            preparedStatement.setString(3, String.join(" ", translatedWords));
-            preparedStatement.setString(4, requestData.getSourceLanguage());
-            preparedStatement.setString(5, requestData.getTargetLanguage());
+            preparedStatement.setString(1, ipAddress);
+            preparedStatement.setString(2, text);
+            preparedStatement.setString(3, translatedText);
+            preparedStatement.setString(4, sourceLanguage);
+            preparedStatement.setString(5, targetLanguage);
             log.debug("Saving to the database complete");
             preparedStatement.executeUpdate();
         } catch (SQLException e) {

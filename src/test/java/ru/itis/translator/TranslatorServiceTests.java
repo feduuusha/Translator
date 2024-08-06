@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.itis.translator.model.RequestData;
 import ru.itis.translator.service.TranslatorServiceImpl;
 
 @SpringBootTest
@@ -18,8 +17,7 @@ public class TranslatorServiceTests {
 
     @Test
     public void translateWordsTest() {
-        RequestData data = new RequestData("ru", "en",
-                new String[]{"привет", "мир"}, "127.0.0.1");
-        Assertions.assertEquals("Hello world", translatorService.translateWords(data));
+        Assertions.assertEquals("Hello world",
+                translatorService.translateWords("ru", "en", "привет мир", " ", "127.0.0.1"));
     }
 }
