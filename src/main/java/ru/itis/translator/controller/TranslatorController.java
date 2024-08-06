@@ -10,7 +10,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.itis.translator.model.RequestData;
 import ru.itis.translator.service.TranslatorService;
 
 @Slf4j
@@ -36,11 +35,9 @@ public class TranslatorController {
                             @RequestParam(value = "text") @NotBlank final String text,
                             @RequestParam(value = "sp") @Length(min = 1, max = 1) final String separator,
                             HttpServletRequest request, Model model) {
-        RequestData requestData =
-                new RequestData(sourceLanguage, targetLanguage, text.split(separator), request.getRemoteAddr());
-        log.debug("Request for " + request.getRequestURI() + "?" + request.getQueryString()
-                + " from IP:" + request.getRemoteAddr());
-        model.addAttribute("translatedText", service.translateWords(requestData));
+        log.debug("Request for " + request.getRequestURI() + "?" + request.getQueryString() + " from IP:" + request.getRemoteAddr());
+        model.addAttribute("translatedText",
+                service.translateWords(sourceLanguage, targetLanguage, text, separator, request.getRemoteAddr()));
         model.addAttribute("sourceLanguage", sourceLanguage);
         model.addAttribute("targetLanguage", targetLanguage);
         model.addAttribute("separator", separator);

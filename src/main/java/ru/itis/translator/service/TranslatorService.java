@@ -1,8 +1,6 @@
 package ru.itis.translator.service;
 
-import ru.itis.translator.model.RequestData;
-
 
 public interface TranslatorService {
-    String translateWords(RequestData requestData);
+    String translateWords(String sourceLanguage, String targetLanguage, String text, String separator, String ipAddress);
 }

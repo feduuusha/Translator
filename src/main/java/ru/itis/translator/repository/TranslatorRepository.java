@@ -1,9 +1,6 @@
 package ru.itis.translator.repository;
 
-import ru.itis.translator.model.RequestData;
-
-import java.util.List;
 
 public interface TranslatorRepository {
-    void saveRequest(RequestData requestData, List<String> translatedWords);
+    void saveRequest(String sourceLanguage, String targetLanguage, String text, String translatedText, String ipAddress);
 }
