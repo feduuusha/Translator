@@ -12,6 +12,7 @@
             text-align: center;
             padding: 50px;
         }
+
         @media screen and (prefers-color-scheme: dark) {
             body {
                 font-family: Arial, sans-serif;

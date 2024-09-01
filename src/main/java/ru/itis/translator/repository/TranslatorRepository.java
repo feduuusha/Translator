@@ -1,6 +1,8 @@
 package ru.itis.translator.repository;
 
 
-public interface TranslatorRepository {
-    void saveRequest(String sourceLanguage, String targetLanguage, String text, String translatedText, String ipAddress);
+import org.springframework.data.jpa.repository.JpaRepository;
+import ru.itis.translator.entity.Request;
+
+public interface TranslatorRepository extends JpaRepository<Request, Integer> {
 }

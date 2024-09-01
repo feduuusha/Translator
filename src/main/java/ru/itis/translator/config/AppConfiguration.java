@@ -4,8 +4,6 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
-import ru.itis.translator.validator.TranslatorValidator;
-import ru.itis.translator.validator.TranslatorValidatorImpl;
 
 import java.time.Duration;
 import java.util.concurrent.ExecutorService;
@@ -24,8 +22,4 @@ public class AppConfiguration {
         return Executors.newFixedThreadPool(10);
     }
 
-    @Bean
-    public TranslatorValidator validator() {
-        return new TranslatorValidatorImpl();
-    }
 }
